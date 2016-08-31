@@ -2,6 +2,8 @@
 //add color command
 //list of commands you can click on to start query
 //switch between shells (option to select your own from a file .exe)
+//automated commands
+//skins
 
 import java.awt.BorderLayout;
 import java.awt.Color;
