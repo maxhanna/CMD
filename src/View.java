@@ -86,7 +86,7 @@ public class View{
 	}
 	public static String sendCommand(String command) throws IOException
 	{
-		if ((command.length()>2)&&(command.substring(0,2).contains("cd")))
+		if ((command.length()>2)&&(command.substring(0,2).toLowerCase().contains("cd")))
 		{
 			if (command.charAt(2)==' ')
 			{
@@ -101,14 +101,14 @@ public class View{
 				return currentDirectory.getAbsolutePath();
 			}
 		}
-		else if ((command.length()>4)&&(command.substring(0,5).contains("mkdir")))
+		else if ((command.length()>4)&&(command.substring(0,5).toLowerCase().contains("mkdir")))
 		{
 			if (!command.contains(":"))
 			{
 				command = "cd " + currentDirectory.getAbsolutePath() + " && mkdir " + command.substring(5,command.length()) ;
 			}
 		}
-		else if ((command.length()>1)&&(command.substring(0,2).contains("md")))
+		else if ((command.length()>1)&&(command.substring(0,2).toLowerCase().contains("md")))
 		{
 			if (!command.contains(":"))
 			{
@@ -116,21 +116,21 @@ public class View{
 			}
 		}
 
-		else if ((command.length()>4)&&(command.substring(0,5).contains("rmdir")))
+		else if ((command.length()>4)&&(command.substring(0,5).toLowerCase().contains("rmdir")))
 		{
 			if (!command.contains(":"))
 			{
 				command = "cd " + currentDirectory.getAbsolutePath() + " && rmdir " + command.substring(5,command.length()) ;
 			}
 		}
-		else if ((command.length()>1)&&(command.substring(0,2).contains("rd")))
+		else if ((command.length()>1)&&(command.substring(0,2).toLowerCase().contains("rd")))
 		{
 			if (!command.contains(":"))
 			{
 				command = "cd " + currentDirectory.getAbsolutePath() + " && rd " + command.substring(3,command.length()) ;
 			}
 		}
-		else if ((command.length()>1)&&(command.substring(0,2).contains("rm")))
+		else if ((command.length()>1)&&(command.substring(0,2).toLowerCase().contains("rm")))
 		{
 			File f = new File(currentDirectory.getAbsolutePath()+slash()+command.substring(3,command.length()));
 			if (!command.contains(":"))
@@ -148,7 +148,7 @@ public class View{
 					command = "del " + command.substring(3,command.length()) ;
 			}
 		}
-		else if ((command.length()>3)&&(command.substring(0,4).contains("type")))
+		else if ((command.length()>3)&&(command.substring(0,4).toLowerCase().contains("type")))
 		{
 			if (!command.contains(":"))
 			{
@@ -158,7 +158,7 @@ public class View{
 					command = "cd " + currentDirectory.getAbsolutePath() + " && cat " + command.substring(5,command.length());
 			}
 		}
-		else if ((command.length()>2)&&(command.substring(0,3).contains("cat")))
+		else if ((command.length()>2)&&(command.substring(0,3).toLowerCase().contains("cat")))
 		{
 			if (!command.contains(":"))
 			{
@@ -168,32 +168,52 @@ public class View{
 					command = "cd " + currentDirectory.getAbsolutePath() + " && cat " + command.substring(4,command.length());
 			}
 		}
-		else if ((command.length()>2)&&(command.substring(0,3).contains("del")))
+		else if ((command.length()>2)&&(command.substring(0,3).toLowerCase().contains("del")))
 		{
 			if (!command.contains(":"))
 			{
 				command = "cd " + currentDirectory.getAbsolutePath() + " && del " + command.substring(4,command.length());
 			}
 		}
-		else if ((command.length()>5)&&(command.substring(0,6).contains("delete")))
+		else if ((command.length()>5)&&(command.substring(0,6).toLowerCase().contains("delete")))
 		{
 			if (!command.contains(":"))
 			{
 				command = "cd " + currentDirectory.getAbsolutePath() + " && delete " + command.substring(7,command.length());
 			}
 		}
-		else if ((command.length()>2)&&(command.substring(0,3).contains("dir")))
+		else if ((command.length()>2)&&(command.substring(0,3).toLowerCase().contains("dir")))
 		{
 			command = "cd " + currentDirectory.getAbsolutePath() + " && dir";
 		}
 		//non program specific commands get evaluated first,
-		else if ((command.length()>6)&&(command.substring(0,7).contains("echo cd")))
+		else if ((command.length()>6)&&(command.substring(0,7).toLowerCase().contains("echo cd")))
 		{
 			return currentDirectory.getAbsolutePath();
 		}
-		else if ((command.length()>3)&&(command.substring(0,4).contains("exit")))
+		else if ((command.length()>3)&&(command.substring(0,4).toLowerCase().contains("exit")))
 		{
 			System.exit(0);
+		}
+		else if ((command.length()>5)&&(command.substring(0,6).toLowerCase().contains("colorf")))
+		{
+			command = command.substring(7,command.length()).trim();
+			String[] commands = new String[3];
+			commands = command.split(",");
+			fontColor = new Color(Integer.parseInt(commands[0]),Integer.parseInt(commands[1]),Integer.parseInt(commands[2]));
+			response.setForeground(fontColor);
+			consoleTextArea.setForeground(fontColor);
+			return "Changed font color to R:"+commands[0]+",G:"+commands[1]+",B:"+commands[2];
+		}
+		else if ((command.length()>4)&&(command.substring(0,5).toLowerCase().contains("color")))
+		{
+			command = command.substring(6,command.length()).trim();
+			String[] commands = new String[3];
+			commands = command.split(",");
+			backgroundColor = new Color(Integer.parseInt(commands[0]),Integer.parseInt(commands[1]),Integer.parseInt(commands[2]));
+			response.setBackground(backgroundColor);
+			consoleTextArea.setBackground(backgroundColor);
+			return "Changed background color to R:"+commands[0]+",G:"+commands[1]+",B:"+commands[2];
 		}
 		//if a non program specific command was entered send command.
 		responseList.push(command);
@@ -209,6 +229,11 @@ public class View{
 		
 		while(!responseList.isEmpty()){
 			res += responseList.removeFirst() + "\n";
+		}
+		if (consoleTextArea.getText().toLowerCase().equals("help"))
+		{
+			res+="COLOR	Change the background color. Usage: color 0-255,0-255,0-255 where 0-255 is your choice of any number between 0 and 255.";
+			res+="\nCOLORF	Change the font color. Usage: colorf 0-255,0-255,0-255 where 0-255 is your choice of any number between 0 and 255.";
 		}
 		return res;
 
@@ -234,14 +259,14 @@ public class View{
 	public static void main(String[] args)
 	{
 		// Create JComponents and add them to containers.
-		JFrame frame = new JFrame(System.getProperty("user.name")+"'s CMD");
-		JPanel panel = new JPanel();
+		final JFrame frame = new JFrame(System.getProperty("user.name")+"'s CMD");
+		final JPanel panel = new JPanel();
 		consoleTextArea = new JTextArea("");
 
 		response = new JTextArea(welcome);
 
-		JScrollPane responseScrollpanel = new JScrollPane(response);
-		JScrollPane queryScrollpanel = new JScrollPane(consoleTextArea);
+		final JScrollPane responseScrollpanel = new JScrollPane(response);
+		final JScrollPane queryScrollpanel = new JScrollPane(consoleTextArea);
 		panel.addComponentListener(new ComponentListener() {
 			public void componentResized(ComponentEvent e) {
 				panel.setSize(frame.getSize());
