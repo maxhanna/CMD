@@ -1,5 +1,3 @@
-//add cursor
-//add color command
 //list of commands you can click on to start query
 //switch between shells (option to select your own from a file .exe)
 //automated commands
@@ -338,6 +336,7 @@ public class View{
 		response.setBackground(backgroundColor);
 		response.setForeground(fontColor);
 		consoleTextArea.setForeground(fontColor);
+		consoleTextArea.setCaret(new CMDCaret());
 		panel.setBorder(new EtchedBorder());
 
 
