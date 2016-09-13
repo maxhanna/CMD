@@ -32,6 +32,7 @@ public class View{
 	static Color backgroundColor = new Color(0,0,0);
 	static Color fontColor = new Color(0x66FF00);
 	static String welcome = "Welcome, "+System.getProperty("user.name")+".";
+	static String windowsCMD = "C:\\Windows\\System32\\cmd.exe";
 	static ArrayDeque<String> responseList = new ArrayDeque<String>();
 	public static class SendCommandThread implements Runnable {
 		public void run() {
@@ -39,11 +40,11 @@ public class View{
 			//if windows
 			if (slash() == "\\")
 				builder = new ProcessBuilder(
-						"C:\\Windows\\System32\\cmd.exe", "/c", responseList.remove());
+						"cmd.exe", "/c", responseList.remove());
 			//else if not windows send command to terminal
 			else
 				builder = new ProcessBuilder(
-						"C:\\Windows\\System32\\cmd.exe", "/c", responseList.remove());
+						"cmd.exe", "/c", responseList.remove());
 			builder.redirectErrorStream(true);
 			Process p;
 			try {
@@ -58,21 +59,21 @@ public class View{
 				if (responseList.isEmpty())
 				{
 					builder = new ProcessBuilder(
-							"C:\\Windows\\System32\\cmd.exe", "/c", "cd " + currentDirectory.getAbsolutePath() + " && dir");
+							"cmd.exe", "/c", "cd " + currentDirectory.getAbsolutePath() + " && dir");
 					builder.redirectErrorStream(true);
 					p = builder.start();
 					r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-					while (true) {
+					while (p.waitFor() != 1) {
 						line = r.readLine();
 						if (line == null) { break; }
 						responseList.push(line);
 					}
-					
+
 				}
 				r.close();
-				
+
 			}
-			catch (IOException e) 
+			catch (Exception e) 
 			{
 				e.printStackTrace();
 			}
@@ -156,6 +157,22 @@ public class View{
 					command = "cd " + currentDirectory.getAbsolutePath() + " && cat " + command.substring(5,command.length());
 			}
 		}
+		else if ((command.length()>3)&&(command.substring(0,4).toLowerCase().contains("comp")))
+		{
+			if (!command.toLowerCase().equals("comp"))
+			{
+				if (!command.contains(":"))
+				{
+						command = "cd " + currentDirectory.getAbsolutePath() + " && comp " + command.substring(5,command.length());
+				}
+				else
+				{
+					command = "comp " + command.substring(5,command.length());
+				}
+			}
+			else return ("You must select which files to compare!");
+			System.out.println(command);
+		}
 		else if ((command.length()>2)&&(command.substring(0,3).toLowerCase().contains("cat")))
 		{
 			if (!command.contains(":"))
@@ -165,6 +182,10 @@ public class View{
 				else
 					command = "cd " + currentDirectory.getAbsolutePath() + " && cat " + command.substring(4,command.length());
 			}
+		}
+		else if ((command.length()>2)&&(command.substring(0,3).toLowerCase().contains("cmd")))
+		{
+			command = "start cmd.exe";
 		}
 		else if ((command.length()>2)&&(command.substring(0,3).toLowerCase().contains("del")))
 		{
@@ -224,7 +245,6 @@ public class View{
 		thread.start();
 		thread.run();
 
-		
 		while(!responseList.isEmpty()){
 			res += responseList.removeFirst() + "\n";
 		}
@@ -256,7 +276,6 @@ public class View{
 	}
 	public static void main(String[] args)
 	{
-		// Create JComponents and add them to containers.
 		final JFrame frame = new JFrame(System.getProperty("user.name")+"'s CMD");
 		final JPanel panel = new JPanel();
 		consoleTextArea = new JTextArea("");
@@ -277,37 +296,17 @@ public class View{
 					frame.setSize(frame.getHeight(), 50);
 				}
 			}
-
-			@Override
-			public void componentHidden(ComponentEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void componentMoved(ComponentEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void componentShown(ComponentEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
+			public void componentHidden(ComponentEvent arg0) {}
+			public void componentMoved(ComponentEvent arg0) {}
+			public void componentShown(ComponentEvent arg0) {}
 		});
 		response.setEditable(false);
 		response.setLineWrap(true);
 		panel.setLayout(new BorderLayout());
 		consoleTextArea.addKeyListener(new KeyListener() {
 
-			@Override
-			public void keyReleased(KeyEvent e) {
-			}
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
+			public void keyReleased(KeyEvent e) {}
+			public void keyTyped(KeyEvent e) {}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -326,10 +325,9 @@ public class View{
 
 			}
 		});
-		// Modify some properties.
+
 		consoleTextArea.setLineWrap(true);
 		frame.setSize(500, 600);
-
 		consoleTextArea.setBackground(backgroundColor);
 		panel.setBackground(backgroundColor);
 		frame.setBackground(backgroundColor);
@@ -338,15 +336,11 @@ public class View{
 		consoleTextArea.setForeground(fontColor);
 		consoleTextArea.setCaret(new CMDCaret());
 		panel.setBorder(new EtchedBorder());
-
-
-
 		panel.add(BorderLayout.NORTH,responseScrollpanel);
 		panel.add(BorderLayout.SOUTH,queryScrollpanel);
 		frame.add(panel);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// Display the Swing application.
 		frame.setVisible(true);
 	}
 }

@@ -7,9 +7,10 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.JTextComponent;
 
+/** For creating a custom caret to append at the end of a jTextArea */
 public class CMDCaret extends DefaultCaret {
-
-        private String mark = "|";
+	private static final long serialVersionUID = 1L;
+		private String mark = "|";
 
         public CMDCaret() {
             setBlinkRate(500);
